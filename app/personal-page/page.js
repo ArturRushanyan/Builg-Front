@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Nav from "../nav/page";
 import {
   getUserFromLocalStorage,
-  getJWTFromLocalStorage,
   setUserToLocalStorage,
 } from "../../service/auth";
+import { updateMe } from "@/service/apiService";
 
 const PersonalDetails = () => {
   const router = useRouter();
@@ -62,26 +61,15 @@ const PersonalDetails = () => {
     };
 
     try {
-      const jwt = getJWTFromLocalStorage();
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/user/me`,
-        updatedUserInfo,
-        {
-          headers: {
-            "content-type": "application/json",
-            authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
+      const res = await updateMe(updatedUserInfo);
       if (res) {
-        setUserToLocalStorage(res.data.user);
+        setUserToLocalStorage(res.user);
         router.replace("/dashboard");
       } else {
         alert("Something went wrong");
       }
     } catch (err) {
       alert(err);
-      console.log("response Error =>>>>>", err);
     }
   };
 

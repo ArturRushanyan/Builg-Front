@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { setLocalStorage } from "@/service/auth";
+import { signIn } from "@/service/apiService";
 
 const SignIn = () => {
   const router = useRouter();
@@ -47,12 +47,10 @@ const SignIn = () => {
     };
 
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/auth/local`,
-        userInputData
-      );
+      const res = await signIn(userInputData);
+
       if (res) {
-        setLocalStorage(res.data);
+        setLocalStorage(res);
       } else {
         alert("Something went wrong");
       }

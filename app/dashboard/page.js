@@ -42,10 +42,8 @@ const Dashboard = () => {
     }
     if (userData.sync_google_reviews) {
       setSyncedUser(userData.sync_google_reviews);
-      const res = getSyncUsers(
-        userInfiniteScrollInfo.offset,
-        userInfiniteScrollInfo.limit
-      )
+
+      getSyncUsers(userInfiniteScrollInfo.offset, userInfiniteScrollInfo.limit)
         .then((usersList) => {
           setUserInfiniteScrollInfo((prevState) => {
             return {
@@ -54,9 +52,8 @@ const Dashboard = () => {
                 userInfiniteScrollInfo.offset + userInfiniteScrollInfo.limit,
             };
           });
-
           setUsersList((prevState) => {
-            return [...prevState, ...usersList.data.syncUsers];
+            return [...prevState, ...usersList.syncUsers];
           });
         })
         .catch((error) => {
@@ -100,10 +97,8 @@ const Dashboard = () => {
 
     const responseData = await getReviews(
       `${item.company_address} ${item.company_name}`,
-      {
-        limit: reviewInfiniteScrollInfo.limit,
-        lastElementId: reviewInfiniteScrollInfo.lastReviewId,
-      }
+      reviewInfiniteScrollInfo.limit,
+      reviewInfiniteScrollInfo.lastReviewId
     );
     if (responseData.length === 0) {
       alert("There is no place");
@@ -146,23 +141,21 @@ const Dashboard = () => {
       userInfiniteScrollInfo.limit
     );
 
-    if (res.data.syncUsers.length === 0) {
+    if (res.syncUsers.length === 0) {
       setUserInfiniteScrollInfo((prevState) => {
         return { ...prevState, hasMore: false };
       });
     }
     setUsersList((prevState) => {
-      return [...prevState, ...res.data.syncUsers];
+      return [...prevState, ...res.syncUsers];
     });
   };
 
   const getMoreReviews = async () => {
     const reviewsData = await getReviews(
       `${showReviewsInfo.company_address} ${showReviewsInfo.company_name}`,
-      {
-        limit: reviewInfiniteScrollInfo.limit,
-        lastElementId: reviewInfiniteScrollInfo.lastReviewId,
-      }
+      reviewInfiniteScrollInfo.limit,
+      reviewInfiniteScrollInfo.lastReviewId
     );
 
     if (reviewsData.length === 0) {

@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import axios from "axios";
 import { setLocalStorage } from "../../service/auth";
 import { signUp } from "../../service/apiService";
 
@@ -64,20 +63,14 @@ const SignUp = () => {
 
     try {
       const res = await signUp(userRegistrationData);
-      console.log("res =>>>", res);
-      // const res = await axios.post(
-      //   `${process.env.NEXT_PUBLIC_STRAPI_URL}/auth/local/register`,
-      //   userRegistrationData
-      // );
       if (res) {
-        setLocalStorage(res.data);
+        setLocalStorage(res);
       } else {
         alert("Something went wrong");
       }
 
       router.replace("/dashboard");
     } catch (err) {
-      console.log("error =>>", err);
       alert(err.response.data.error.message);
     }
   };
