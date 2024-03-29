@@ -30,13 +30,7 @@ const Nav = () => {
         <div>
           <Link href="/dashboard" passHref>
             {/* eslint-disable @next/next/no-img-element */}
-            <img
-              className="m-3"
-              src="/app-logo.svg"
-              width={40}
-              height={40}
-              alt="Strapi Logo"
-            />
+            <img className="m-3 ml-7" src="/app-logo.svg" alt="App logo" />
           </Link>
         </div>
 

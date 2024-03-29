@@ -11,6 +11,8 @@ import { getSyncUsers, getReviews } from "../../service/apiService";
 const Dashboard = () => {
   const router = useRouter();
 
+  const [selectedItemId, setSelectedItemId] = useState(null);
+
   const [showReviewsInfo, setShowReviewsInfo] = useState({
     company_address: "",
     company_name: "",
@@ -81,6 +83,8 @@ const Dashboard = () => {
   const reviewsDetailsHandler = async (item) => {
     setReviews([]);
 
+    setSelectedItemId(item.id);
+
     setShowReviewsInfo(() => {
       return {
         company_address: item.company_address,
@@ -105,6 +109,9 @@ const Dashboard = () => {
       setShowReviewsInfo((prevState) => {
         return { ...prevState, showReviews: false };
       });
+
+      setSelectedItemId(null);
+
       return;
     }
     const lastReviewItem = responseData.slice(-1);
@@ -145,6 +152,7 @@ const Dashboard = () => {
       setUserInfiniteScrollInfo((prevState) => {
         return { ...prevState, hasMore: false };
       });
+      setSelectedItemId(null);
     }
     setUsersList((prevState) => {
       return [...prevState, ...res.syncUsers];
@@ -183,33 +191,42 @@ const Dashboard = () => {
     <main>
       <Nav />
       {syncedUser && (
-        <div className="h-[calc(100vh-160px)] m-10 flex flex-row bg-white relative">
-          <div className="w-full flex flex-col overflow-auto h-full p-5">
+        <div className="h-[calc(100vh-150px)] m-10 flex flex-row relative">
+          <div className="w-full h-full overflow-auto ">
             <InfiniteScroll
               dataLength={usersList.length}
               next={getMoreUsers}
               hasMore={userInfiniteScrollInfo.hasMore}
               loader={<h3 className="text-center"> Loading...</h3>}
-              height={"700px"}
+              height={"80vh"}
               endMessage={<h4 className="text-center">Nothing more to show</h4>}
-              style={{ maxHeight: "h-full" }}
             >
               {usersList.map((item) => (
-                <div key={`${item.id} - ${Math.random()}`}>
-                  <div className="bg-whit border border-gry-700 my-4 grid grid-cols-2">
+                <div key={`${item.id}`}>
+                  <div
+                    className="my-4 mr-4 border grid grid-cols-2 rounded-lg"
+                    style={{
+                      backgroundColor: "white",
+                      borderColor:
+                        item.id == selectedItemId ? "#1c64f2" : "white",
+                    }}
+                  >
                     <div className="flex flex-row">
                       <div>
                         <img
-                          src="user.png"
-                          width={"50px"}
-                          className="m-2 ml-5 object-contain"
+                          src="user.svg"
+                          width={"40px"}
+                          className="m-2 ml-5 object-contain max-w-pros"
                         />
                       </div>
-                      <div className="m-2 flex flex-col">
-                        <span>
-                          {item.first_name} {item.last_name}
+                      <div className="m-2 flex flex-col sm: w-full 1/2 text-sm ml-7">
+                        <span className="flex flex-row">
+                          <p>{item.first_name}</p>
+                          <p>{item.last_name}</p>
                         </span>
-                        <span>{item.email}</span>
+                        <span className="sm:text-sm md:text-base">
+                          {item.email}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-end">
@@ -217,7 +234,7 @@ const Dashboard = () => {
                         className="text-3xl mr-2"
                         onClick={() => reviewsDetailsHandler(item)}
                       >
-                        &gt;
+                        <img src="/right-arrow.svg" />
                       </button>
                     </div>
                   </div>
@@ -226,20 +243,22 @@ const Dashboard = () => {
             </InfiniteScroll>
           </div>
           {showReviewsInfo.showReviews && (
-            <div className="flex flex-col w-full 1/2 text-left my-4 mx-10 py-5">
+            <div className="flex flex-col w-full 1/2 text-left my-4 mx-6 py-5">
               <div id="top" className="grid grid-cols-2">
                 <div className="flex flex-row">
                   <div className="flex flex-col">
-                    <span className="justify-start font-bold my-2">
+                    <span className="justify-start font-bold my-2 sm:text-sm">
                       {showReviewsInfo.company_name}
                     </span>
                     <div className="flex flex-row mb-3">
                       <img
-                        src="location.png"
+                        src="location.svg"
                         width={22}
                         className="object-contain"
                       />
-                      <p>{showReviewsInfo.company_address}</p>
+                      <p className="sm:text-xs md:text-base">
+                        {showReviewsInfo.company_address}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -253,22 +272,21 @@ const Dashboard = () => {
                 </div>
               </div>
               <hr />
-              <div className="overflow-auto h-full pr-8">
+              <div className="overflow-auto h-full">
                 <InfiniteScroll
                   dataLength={reviews.length}
                   next={getMoreReviews}
                   hasMore={reviewInfiniteScrollInfo.hasMore}
                   loader={<h3 className="text-center"> Loading...</h3>}
-                  height={"700px"}
+                  height={"70vh"}
                   endMessage={
                     <h4 className="text-center">Nothing more to show</h4>
                   }
-                  style={{ maxHeight: "h-full" }}
                 >
                   {reviews.map((item) => (
                     <div
                       key={item.author_id + Math.random()}
-                      className="my-10 "
+                      className="my-10 p-2"
                     >
                       <div className="grid grid-cols-2">
                         <div className="flex flex-row">
@@ -277,14 +295,41 @@ const Dashboard = () => {
                             width={"25px"}
                             className="mb-2 object-contain"
                           />
-                          <span className="ml-2">{item.author_title}</span>
+                          <div>
+                            <span className="ml-2 sm:text-xs">
+                              {item.author_title}
+                            </span>
+                            <span className="flex flex-row">
+                              <img
+                                src="google.png"
+                                width={"15px"}
+                                className="ml-2 m-1 object-contain"
+                              />
+                              <span className="flex flex-row ml-2">
+                                {[...Array(item.review_rating)].map(() => (
+                                  <img
+                                    src="star-type-1.svg"
+                                    className="ml-1 object-contain"
+                                  />
+                                ))}
+                                {[...Array(5 - item.review_rating)].map(() => (
+                                  <img
+                                    src="star-type-2.svg"
+                                    className="ml-1 object-contain"
+                                  />
+                                ))}
+                              </span>
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end md:text-sm sm:text-xs">
                           {formatDate(item.review_datetime_utc)}
                         </div>
                       </div>
                       <div className="text-left flex-grow">
-                        <p>{item.review_text}</p>
+                        <p className="sm:text-xs md:text-sm  ">
+                          {item.review_text}
+                        </p>
                       </div>
                     </div>
                   ))}

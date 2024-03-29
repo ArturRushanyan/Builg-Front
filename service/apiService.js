@@ -73,6 +73,5 @@ export const getReviews = async (company_address, limit, lastElementId) => {
   };
 
   const reviewResponse = await axiosCall(axiosParams);
-
   return reviewResponse.data[0].reviews_data;
 };
